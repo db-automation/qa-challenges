@@ -48,7 +48,8 @@
         async function loadUserProfile() {
             try {
                 // Make REAL HTTP request - intercepted by Service Worker
-                // This will hang in "Pending" state for 60 seconds
+                // This will hang in "Pending" state for 15 seconds then timeout
+                
                 const response = await fetch(`${window.location.origin}/api/user/profile`);
                 
                 if (response.ok) {
@@ -64,7 +65,7 @@
                         <p>${userData.email}</p>
                     `;
                 } else {
-                    // After 60 seconds, will get 504 error
+                    // After 15 seconds, will get 504 error
                     throw new Error('Server timeout');
                 }
                 

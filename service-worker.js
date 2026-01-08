@@ -5,7 +5,7 @@
 const MOCK_DELAY = {
     order: 500,
     products: 800,
-    profile: 60000
+    profile: 15000  // Reduced from 60s to 15s for better demo
 };
 
 // Mock database
@@ -39,26 +39,29 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     
+    // Only intercept API requests, let everything else pass through naturally
     // Challenge 1: Place Order - Returns 422 Error
     if (url.pathname.includes('/api/v1/order')) {
+        console.log('🔵 SW intercepting order request:', url.href);
         event.respondWith(handlePlaceOrder(event.request));
         return;
     }
     
     // Challenge 2: Get Products
     if (url.pathname.includes('/api/products')) {
+        console.log('🔵 SW intercepting products request:', url.href);
         event.respondWith(handleGetProducts(event.request));
         return;
     }
     
     // Challenge 3: User Profile - Timeout
     if (url.pathname.includes('/api/user/profile')) {
+        console.log('🔵 SW intercepting profile request:', url.href);
         event.respondWith(handleGetProfile(event.request));
         return;
     }
     
-    // Not a mock API, pass through
-    event.respondWith(fetch(event.request));
+    // Not a mock API request, don't intercept - let browser handle it normally
 });
 
 // Challenge 1: Returns 422 error after delay
