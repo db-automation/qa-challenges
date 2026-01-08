@@ -49,7 +49,7 @@
             try {
                 // Make REAL HTTP request - intercepted by Service Worker
                 // This will hang in "Pending" state for 60 seconds
-                const response = await fetch('/api/user/profile');
+                const response = await fetch(`${window.location.origin}/api/user/profile`);
                 
                 if (response.ok) {
                     const userData = await response.json();

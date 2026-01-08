@@ -78,7 +78,7 @@
         // Load all products on page load
         async function loadInitialProducts() {
             try {
-                const response = await fetch('/api/products');
+                const response = await fetch(`${window.location.origin}/api/products`);
                 const products = await response.json();
                 displayProducts(products);
             } catch (error) {
@@ -100,8 +100,8 @@
                 // But the REAL category ID in database is 456!
                 
                 const url = selectedValue 
-                    ? `/api/products?category=${selectedValue}`
-                    : '/api/products';
+                    ? `${window.location.origin}/api/products?category=${selectedValue}`
+                    : `${window.location.origin}/api/products`;
                 
                 const response = await fetch(url);
                 const products = await response.json();

@@ -73,7 +73,7 @@
             try {
                 // Make REAL HTTP request - intercepted by Service Worker
                 // This WILL show in Network tab!
-                const response = await fetch('/api/v1/order', {
+                const response = await fetch(`${window.location.origin}/api/v1/order`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
