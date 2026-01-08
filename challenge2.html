@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge 2: Vanishing Data</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="mock-api.js"></script>
+</head>
+<body>
+    <div class="challenge-container">
+        <a href="index.html" class="back-link">← Back to Challenges</a>
+        
+        <div class="challenge-header">
+            <div class="challenge-number">Challenge 2</div>
+            <h1>Vanishing Data</h1>
+            <p class="subtitle">Products disappear when filtering by category</p>
+        </div>
+
+        <div class="challenge-content">
+            <h2>🛍️ Product Catalog</h2>
+            
+            <div class="form-group">
+                <label for="categorySelect">Filter by Category:</label>
+                <select id="categorySelect" class="form-control">
+                    <option value="">All Products</option>
+                    <option value="123">Electronics</option>
+                    <option value="124">Clothing</option>
+                    <option value="125">Books</option>
+                </select>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <button id="applyFilterBtn" class="btn btn-warning">
+                    Apply Filter
+                </button>
+            </div>
+
+            <div id="loadingIndicator" style="text-align: center; display: none;">
+                <div class="loader"></div>
+                <p>Loading products...</p>
+            </div>
+
+            <div id="productsContainer">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function displayProducts(products) {
+            const container = document.getElementById('productsContainer');
+            
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No products found</h3>
+                        <p>Try selecting a different category</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="product-grid">
+                    ${products.map(product => `
+                        <div class="product-card">
+                            <div class="product-icon">${product.icon}</div>
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-price">$${product.price}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Load all products on page load
+        async function loadInitialProducts() {
+            try {
+                const response = await fetch('/api/products');
+                const products = await response.json();
+                displayProducts(products);
+            } catch (error) {
+                console.error('Failed to load products:', error);
+            }
+        }
+
+        document.getElementById('applyFilterBtn').addEventListener('click', async function() {
+            const categorySelect = document.getElementById('categorySelect');
+            const selectedValue = categorySelect.value;
+            
+            // Show loading
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('productsContainer').innerHTML = '';
+            
+            try {
+                // BUG: Frontend sends wrong category ID!
+                // The dropdown has value="123" for Electronics
+                // But the REAL category ID in database is 456!
+                
+                const url = selectedValue 
+                    ? `/api/products?category=${selectedValue}`
+                    : '/api/products';
+                
+                const response = await fetch(url);
+                const products = await response.json();
+                
+                // Hide loading
+                document.getElementById('loadingIndicator').style.display = 'none';
+                
+                // Display products (will be empty because wrong ID was sent)
+                displayProducts(products);
+            } catch (error) {
+                console.error('Failed to filter products:', error);
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+        });
+
+        // Initialize
+        loadInitialProducts();
+    </script>
+</body>
+</html>

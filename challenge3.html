@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge 3: Infinite Loader</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="mock-api.js"></script>
+</head>
+<body>
+    <div class="challenge-container">
+        <a href="index.html" class="back-link">← Back to Challenges</a>
+        
+        <div class="challenge-header">
+            <div class="challenge-number">Challenge 3</div>
+            <h1>Infinite Loader</h1>
+            <p class="subtitle">Profile data never loads</p>
+        </div>
+
+        <div class="challenge-content">
+            <h2>👤 User Profile</h2>
+            
+            <div class="profile-content">
+                <div class="avatar-section">
+                    <div id="avatarContainer">
+                        <div class="loader"></div>
+                    </div>
+                </div>
+                
+                <div class="user-info">
+                    <div id="userNameContainer">
+                        <div class="loader"></div>
+                    </div>
+                    <div id="userEmailContainer" style="margin-top: 1rem;">
+                        <div class="loader"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorContainer" style="margin-top: 2rem; display: none;">
+                <!-- Error message should appear here after timeout -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Attempt to load user profile
+        async function loadUserProfile() {
+            try {
+                // Make REAL HTTP request - intercepted by Service Worker
+                // This will hang in "Pending" state for 60 seconds
+                const response = await fetch('/api/user/profile');
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    
+                    document.getElementById('avatarContainer').innerHTML = `
+                        <div class="avatar">JD</div>
+                    `;
+                    document.getElementById('userNameContainer').innerHTML = `
+                        <h2>${userData.name}</h2>
+                    `;
+                    document.getElementById('userEmailContainer').innerHTML = `
+                        <p>${userData.email}</p>
+                    `;
+                } else {
+                    // After 60 seconds, will get 504 error
+                    throw new Error('Server timeout');
+                }
+                
+            } catch (error) {
+                // BUG: Frontend doesn't show user-friendly error message
+                // The loaders keep spinning even after the error
+                
+                console.error('Failed to load profile:', error);
+                
+                // This is what SHOULD happen:
+                // document.getElementById('avatarContainer').innerHTML = '❌';
+                // document.getElementById('userNameContainer').innerHTML = '<p>Failed to load profile</p>';
+                // document.getElementById('errorContainer').innerHTML = `
+                //     <div style="color: var(--danger); padding: 1rem; background: #fee2e2; border-radius: 8px;">
+                //         <strong>Error:</strong> Unable to load profile. Please try again later.
+                //     </div>
+                // `;
+                // document.getElementById('errorContainer').style.display = 'block';
+            }
+        }
+
+        // Load profile on page load
+        loadUserProfile();
+
+        // Add a helper message after 10 seconds
+        setTimeout(() => {
+            console.log('💡 Hint: The request is still pending. Check the Network tab!');
+        }, 10000);
+
+        // Add another message after 30 seconds
+        setTimeout(() => {
+            console.log('⏰ 30 seconds have passed... This is taking too long. Something is wrong with the server.');
+        }, 30000);
+    </script>
+</body>
+</html>

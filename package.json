@@ -1,0 +1,11 @@
+{
+  "name": "qa-challenges",
+  "version": "1.0.0",
+  "description": "QA Engineer practical interview challenges - debugging scenarios",
+  "license": "MIT",
+  "author": "",
+  "scripts": {
+    "start": "python3 -m http.server 8000"
+  },
+  "keywords": ["qa", "testing", "debugging", "interview", "devtools"]
+}
